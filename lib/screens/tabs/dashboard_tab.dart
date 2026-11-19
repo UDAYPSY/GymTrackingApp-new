@@ -53,9 +53,10 @@ class _DashboardTabState extends State<DashboardTab>
   void _openRecordAttendanceDialog([DateTime? targetDate]) {
     final state = AppState.instance;
     final date = targetDate ?? _selectedDate;
+    final messenger = ScaffoldMessenger.of(context);
 
     if (state.members.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      messenger.showSnackBar(
         const SnackBar(
           content: Text('Please add a member before recording attendance.'),
           backgroundColor: AppColors.primaryTeal,
@@ -71,7 +72,7 @@ class _DashboardTabState extends State<DashboardTab>
       context: context,
       builder: (ctx) {
         return StatefulBuilder(
-          builder: (context, setDialogState) {
+          builder: (dialogCtx, setDialogState) {
             return AlertDialog(
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
@@ -145,7 +146,7 @@ class _DashboardTabState extends State<DashboardTab>
                     );
                     Navigator.pop(ctx);
                     setState(() {});
-                    ScaffoldMessenger.of(context).showSnackBar(
+                    messenger.showSnackBar(
                       SnackBar(
                         content: Text(
                             'Attendance recorded for ${member.name}!'),
@@ -212,7 +213,8 @@ class _DashboardTabState extends State<DashboardTab>
   Widget _buildMembershipSubTab() {
     final state = AppState.instance;
     final activeCount = state.members.length;
-    final todayAttendanceCount = state.getAttendanceForDate(DateTime(2026, 11, 19)).length;
+    final todayAttendanceCount =
+        state.getAttendanceForDate(DateTime(2026, 11, 19)).length;
 
     return Stack(
       children: [
@@ -517,7 +519,7 @@ class _DashboardTabState extends State<DashboardTab>
     );
   }
 
-  // 2. Payments Sub-Tab (Fully Scrollable & Dynamic)
+  // 2. Payments Sub-Tab
   Widget _buildPaymentsSubTab() {
     final state = AppState.instance;
 
@@ -763,7 +765,7 @@ class _DashboardTabState extends State<DashboardTab>
     );
   }
 
-  // 3. Attendance Sub-Tab (Interactive Calendar & Back-dated entries)
+  // 3. Attendance Sub-Tab
   Widget _buildAttendanceSubTab() {
     final state = AppState.instance;
     final selectedRecords = state.getAttendanceForDate(_selectedDate);
@@ -871,7 +873,7 @@ class _DashboardTabState extends State<DashboardTab>
 
         const SizedBox(height: 12),
 
-        // Add Back-dated Entry Button (Fully Interactive!)
+        // Add Back-dated Entry Button
         SizedBox(
           width: double.infinity,
           height: 44,

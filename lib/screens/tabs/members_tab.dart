@@ -1,4 +1,3 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import '../../theme/app_colors.dart';
 import '../../state/app_state.dart';
@@ -124,7 +123,7 @@ class _MembersTabState extends State<MembersTab> {
                     setState(() {});
                   },
                 );
-              }).toList(),
+              }),
               const SizedBox(height: 12),
             ],
           ),
@@ -144,7 +143,7 @@ class _MembersTabState extends State<MembersTab> {
         children: [
           Column(
             children: [
-              // Search & M ID Toggle Header (Teal Background Area)
+              // Search & M ID Toggle Header
               Container(
                 color: AppColors.primaryTeal,
                 padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
@@ -248,85 +247,65 @@ class _MembersTabState extends State<MembersTab> {
                 ),
               ),
 
-              // Smooth Horizontal Filter Chips Row (Touch + Mouse Drag enabled)
-              ScrollConfiguration(
-                behavior: const MaterialScrollBehavior().copyWith(
-                  dragDevices: {
-                    PointerDeviceKind.touch,
-                    PointerDeviceKind.mouse,
-                    PointerDeviceKind.trackpad,
-                  },
-                ),
-                child: SizedBox(
-                  height: 48,
-                  child: ListView(
-                    controller: _filterScrollController,
-                    scrollDirection: Axis.horizontal,
-                    physics: const BouncingScrollPhysics(
-                      parent: AlwaysScrollableScrollPhysics(),
+              // Smooth Horizontal Filter Chips Row
+              SizedBox(
+                height: 48,
+                child: ListView(
+                  controller: _filterScrollController,
+                  scrollDirection: Axis.horizontal,
+                  physics: const BouncingScrollPhysics(),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  children: [
+                    _buildInteractiveChip(
+                      label: _selectedStatusFilter,
+                      items: const ['All', 'Active', 'Due', 'Expired'],
+                      onSelected: (v) =>
+                          setState(() => _selectedStatusFilter = v),
                     ),
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    children: [
-                      // Filter 1: Status
-                      _buildInteractiveChip(
-                        label: _selectedStatusFilter,
-                        items: ['All', 'Active', 'Due', 'Expired'],
-                        onSelected: (v) =>
-                            setState(() => _selectedStatusFilter = v),
-                      ),
-                      const SizedBox(width: 8),
-
-                      // Filter 2: Sorting
-                      _buildInteractiveChip(
-                        label: _selectedSorting,
-                        items: [
-                          'Needs Attention First',
-                          'Recently Added',
-                        ],
-                        onSelected: (v) => setState(() => _selectedSorting = v),
-                      ),
-                      const SizedBox(width: 8),
-
-                      // Filter 3: Plans
-                      _buildInteractiveChip(
-                        label: _selectedPlanFilter,
-                        items: [
-                          'All Plans',
-                          ...state.plans.map((p) => p.name)
-                        ],
-                        onSelected: (v) =>
-                            setState(() => _selectedPlanFilter = v),
-                      ),
-                      const SizedBox(width: 8),
-
-                      // Filter 4: Batch
-                      _buildInteractiveChip(
-                        label: _selectedBatchFilter,
-                        items: [
-                          'Select Batch',
-                          'Morning',
-                          'Evening',
-                          'General',
-                        ],
-                        onSelected: (v) =>
-                            setState(() => _selectedBatchFilter = v),
-                      ),
-                      const SizedBox(width: 8),
-
-                      // Filter 5: Gender
-                      _buildInteractiveChip(
-                        label: _selectedGenderFilter,
-                        items: [
-                          'Select Gender',
-                          'Male',
-                          'Female',
-                        ],
-                        onSelected: (v) =>
-                            setState(() => _selectedGenderFilter = v),
-                      ),
-                      const SizedBox(width: 20),
-                    ],
-                  ),
+                    const SizedBox(width: 8),
+                    _buildInteractiveChip(
+                      label: _selectedSorting,
+                      items: const [
+                        'Needs Attention First',
+                        'Recently Added',
+                      ],
+                      onSelected: (v) => setState(() => _selectedSorting = v),
+                    ),
+                    const SizedBox(width: 8),
+                    _buildInteractiveChip(
+                      label: _selectedPlanFilter,
+                      items: [
+                        'All Plans',
+                        ...state.plans.map((p) => p.name)
+                      ],
+                      onSelected: (v) =>
+                          setState(() => _selectedPlanFilter = v),
+                    ),
+                    const SizedBox(width: 8),
+                    _buildInteractiveChip(
+                      label: _selectedBatchFilter,
+                      items: const [
+                        'Select Batch',
+                        'Morning',
+                        'Evening',
+                        'General',
+                      ],
+                      onSelected: (v) =>
+                          setState(() => _selectedBatchFilter = v),
+                    ),
+                    const SizedBox(width: 8),
+                    _buildInteractiveChip(
+                      label: _selectedGenderFilter,
+                      items: const [
+                        'Select Gender',
+                        'Male',
+                        'Female',
+                      ],
+                      onSelected: (v) =>
+                          setState(() => _selectedGenderFilter = v),
+                    ),
+                    const SizedBox(width: 20),
+                  ],
                 ),
               ),
 

@@ -176,7 +176,7 @@ class AppState extends ChangeNotifier {
       return a.date.year == date.year &&
           a.date.month == date.month &&
           a.date.day == date.day;
-    }).toList().isNotEmpty;
+    });
   }
 
   int get nextMembershipId => members.length + 1;
