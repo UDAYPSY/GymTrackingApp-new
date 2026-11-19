@@ -28,8 +28,18 @@ jobs:
           channel: 'stable'
           cache: true
 
+      - name: Configure Android SDK & Licenses
+        run: |
+          flutter config --no-analytics
+          flutter config --android-sdk "$ANDROID_HOME"
+          yes | flutter doctor --android-licenses || true
+          flutter doctor -v
+
       - name: Scaffold Native Platform Runners
-        run: flutter create . --project-name track_my_gym --platforms=android,web --org com.trackmygym
+        run: |
+          flutter create . --project-name track_my_gym --platforms=android,web --org com.trackmygym
+          git checkout -- test/
+          chmod +x android/gradlew || true
 
       - name: Install Dependencies
         run: flutter pub get
