@@ -8,7 +8,7 @@ void main() {
 }
 
 class TrackMyGymApp extends StatelessWidget {
-  const TrackMyGymApp({Key? key}) : super(key: key);
+  const TrackMyGymApp({super.key});
 
   @override
   Widget build(BuildContext context) {

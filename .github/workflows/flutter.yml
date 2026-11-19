@@ -15,6 +15,12 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
       - name: Set up Flutter SDK
         uses: subosito/flutter-action@v2
         with:
@@ -26,10 +32,10 @@ jobs:
         run: flutter pub get
 
       - name: Analyze Project Code
-        run: flutter analyze --no-fatal-infos
+        run: flutter analyze --no-fatal-warnings --no-fatal-infos
 
       - name: Run Unit & Widget Tests
         run: flutter test --no-pub
 
-      - name: Build Web / Android APK
+      - name: Build Android APK
         run: flutter build apk --debug

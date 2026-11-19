@@ -5,9 +5,9 @@ class StepperHeader extends StatelessWidget {
   final int currentStep; // 1: Add Plan, 2: Add Member, 3: View Dashboard
 
   const StepperHeader({
-    Key? key,
+    super.key,
     required this.currentStep,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

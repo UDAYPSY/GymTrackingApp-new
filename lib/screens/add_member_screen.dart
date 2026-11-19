@@ -7,7 +7,7 @@ import '../state/app_state.dart';
 import 'dashboard_screen.dart';
 
 class AddMemberScreen extends StatefulWidget {
-  const AddMemberScreen({Key? key}) : super(key: key);
+  const AddMemberScreen({super.key});
 
   @override
   State<AddMemberScreen> createState() => _AddMemberScreenState();
@@ -39,7 +39,7 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
   DateTime? _reminderDateTime;
   String _discountType = 'Percent'; // 'Percent' or 'Amount'
 
-  final List<String> _paymentMethods = [
+  final List<String> _paymentMethods = const [
     'Select Payment Method',
     'Cash',
     'UPI / QR Code',
@@ -54,7 +54,6 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
     _membershipIdController =
         TextEditingController(text: appState.nextMembershipId.toString());
 
-    // Pick latest plan or default
     _selectedPlan = appState.plans.isNotEmpty
         ? appState.plans.last
         : const PlanModel(
@@ -64,6 +63,20 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
             durationType: 'Months',
             durationValue: 6,
           );
+  }
+
+  @override
+  void dispose() {
+    _membershipIdController.dispose();
+    _batchController.dispose();
+    _paidAmountController.dispose();
+    _commentsController.dispose();
+    _discountController.dispose();
+    _admissionFeesController.dispose();
+    _emailController.dispose();
+    _addressController.dispose();
+    _notesController.dispose();
+    super.dispose();
   }
 
   double get _calculatedDueAmount {
@@ -142,7 +155,6 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
 
     AppState.instance.addMember(newMember);
 
-    // Flow completed -> Navigate directly to Dashboard with tabs!
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(builder: (ctx) => const DashboardScreen()),
       (route) => false,
@@ -270,7 +282,9 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
                             DropdownButtonFormField<PlanModel>(
                               value: availablePlans.contains(_selectedPlan)
                                   ? _selectedPlan
-                                  : availablePlans.first,
+                                  : (availablePlans.isNotEmpty
+                                      ? availablePlans.first
+                                      : null),
                               decoration: const InputDecoration(
                                 labelText: 'Select Gym Plan',
                                 prefixIcon: Icon(
@@ -555,7 +569,7 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
 
                       const SizedBox(height: 16),
 
-                      // Member Details Card (Image 7)
+                      // Member Details Card
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(

@@ -36,4 +36,14 @@ class PlanModel {
       durationValue: (map['durationValue'] as num?)?.toInt() ?? 1,
     );
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is PlanModel &&
+          runtimeType == other.runtimeType &&
+          id == other.id;
+
+  @override
+  int get hashCode => id.hashCode;
 }

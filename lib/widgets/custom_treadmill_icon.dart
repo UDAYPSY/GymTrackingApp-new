@@ -5,10 +5,10 @@ class CustomTreadmillIcon extends StatelessWidget {
   final Color color;
 
   const CustomTreadmillIcon({
-    Key? key,
+    super.key,
     this.size = 110,
     this.color = const Color(0x3D002B2C),
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -65,14 +65,12 @@ class _TreadmillPainter extends CustomPainter {
     );
 
     // Runner Arms
-    // Left arm (forward-bent)
     final leftArm = Path()
       ..moveTo(w * 0.47, h * 0.40)
       ..lineTo(w * 0.56, h * 0.43)
       ..lineTo(w * 0.60, h * 0.38);
     canvas.drawPath(leftArm, strokePaint);
 
-    // Right arm (backward-bent)
     final rightArm = Path()
       ..moveTo(w * 0.47, h * 0.40)
       ..lineTo(w * 0.38, h * 0.46)
@@ -80,14 +78,12 @@ class _TreadmillPainter extends CustomPainter {
     canvas.drawPath(rightArm, strokePaint);
 
     // Runner Legs
-    // Front leg (bent up/forward)
     final frontLeg = Path()
       ..moveTo(w * 0.44, h * 0.55)
       ..lineTo(w * 0.55, h * 0.64)
       ..lineTo(w * 0.55, h * 0.79);
     canvas.drawPath(frontLeg, strokePaint);
 
-    // Back leg (extended backward)
     final backLeg = Path()
       ..moveTo(w * 0.44, h * 0.55)
       ..lineTo(w * 0.32, h * 0.68)

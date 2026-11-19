@@ -6,7 +6,7 @@ import '../state/app_state.dart';
 import 'add_member_screen.dart';
 
 class AddPlanScreen extends StatefulWidget {
-  const AddPlanScreen({Key? key}) : super(key: key);
+  const AddPlanScreen({super.key});
 
   @override
   State<AddPlanScreen> createState() => _AddPlanScreenState();
@@ -19,10 +19,17 @@ class _AddPlanScreenState extends State<AddPlanScreen> {
 
   bool _fillTestData = false;
   String _durationType = 'Months'; // 'Months' or 'Days'
-  int _selectedDuration = 1; // 1 month or 30 days
+  int _selectedDuration = 1;
 
-  final List<int> _monthOptions = [1, 2, 3, 6, 12];
-  final List<int> _dayOptions = [15, 30, 45, 60, 90, 180, 365];
+  final List<int> _monthOptions = const [1, 2, 3, 6, 12];
+  final List<int> _dayOptions = const [15, 30, 45, 60, 90, 180, 365];
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _priceController.dispose();
+    super.dispose();
+  }
 
   void _onToggleTestData(bool value) {
     setState(() {

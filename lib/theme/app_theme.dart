@@ -9,7 +9,6 @@ class AppTheme {
         seedColor: AppColors.primaryTeal,
         primary: AppColors.primaryTeal,
         surface: AppColors.surface,
-        background: AppColors.background,
       ),
       scaffoldBackgroundColor: AppColors.background,
       appBarTheme: const AppBarTheme(

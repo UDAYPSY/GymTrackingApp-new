@@ -9,9 +9,9 @@ class SignUpScreen extends StatefulWidget {
   final String initialEmail;
 
   const SignUpScreen({
-    Key? key,
+    super.key,
     this.initialEmail = '',
-  }) : super(key: key);
+  });
 
   @override
   State<SignUpScreen> createState() => _SignUpScreenState();
@@ -41,6 +41,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
           : 'udaypratapsi2022@gmail.com',
     );
     _passwordController = TextEditingController(text: 'password123');
+  }
+
+  @override
+  void dispose() {
+    _gymNameController.dispose();
+    _yourNameController.dispose();
+    _phoneController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _referralController.dispose();
+    super.dispose();
   }
 
   void _onSignUp() {
@@ -136,7 +147,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         ],
                       ),
                     ),
-                    const SizedBox(width: 40), // Balance back button
+                    const SizedBox(width: 40),
                   ],
                 ),
               ),

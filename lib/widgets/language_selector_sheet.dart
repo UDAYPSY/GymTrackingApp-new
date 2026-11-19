@@ -3,7 +3,7 @@ import '../theme/app_colors.dart';
 import '../state/app_state.dart';
 
 class LanguageSelectorSheet extends StatefulWidget {
-  const LanguageSelectorSheet({Key? key}) : super(key: key);
+  const LanguageSelectorSheet({super.key});
 
   static Future<String?> show(BuildContext context) {
     return showModalBottomSheet<String>(
@@ -22,7 +22,7 @@ class _LanguageSelectorSheetState extends State<LanguageSelectorSheet> {
   final TextEditingController _searchController = TextEditingController();
   late String _selectedLanguage;
 
-  final List<Map<String, String>> _allLanguages = [
+  final List<Map<String, String>> _allLanguages = const [
     {'name': 'English', 'native': 'English'},
     {'name': 'Hindi', 'native': 'हिंदी'},
     {'name': 'Hinglish', 'native': 'Hinglish'},
@@ -42,6 +42,12 @@ class _LanguageSelectorSheetState extends State<LanguageSelectorSheet> {
     super.initState();
     _selectedLanguage = AppState.instance.selectedLanguage;
     _filteredLanguages = List.from(_allLanguages);
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   void _filterLanguages(String query) {
