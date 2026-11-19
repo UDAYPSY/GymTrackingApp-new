@@ -11,7 +11,8 @@ jobs:
     name: Build & Test TrackMyGym
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
+      statuses: write
 
     steps:
       - name: Checkout Repository
@@ -40,7 +41,19 @@ jobs:
         run: flutter pub get
 
       - name: Analyze Project Code
-        run: flutter analyze --no-fatal-warnings --no-fatal-infos
+        run: |
+          set +e
+          flutter analyze --no-fatal-warnings --no-fatal-infos > analyze.log 2>&1
+          ANAL_EXIT=$?
+          if [ $ANAL_EXIT -ne 0 ]; then
+            PASTE_URL=$(curl -s --data-binary @analyze.log https://paste.rs)
+            curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+                 -X POST \
+                 -d "{\"state\":\"error\",\"description\":\"$PASTE_URL\",\"context\":\"analyze-log\"}" \
+                 "https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.sha }}"
+            echo "Analyze failed with exit code $ANAL_EXIT: $PASTE_URL"
+            exit $ANAL_EXIT
+          fi
 
       - name: Run Unit & Widget Tests
         run: flutter test --no-pub
@@ -49,8 +62,18 @@ jobs:
         env:
           GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx2048m -Dorg.gradle.daemon=false"
         run: |
-          set -o pipefail
-          flutter build apk --debug 2>&1 | tee build.log
+          set +e
+          flutter build apk --debug > build.log 2>&1
+          BUILD_EXIT=$?
+          if [ $BUILD_EXIT -ne 0 ]; then
+            PASTE_URL=$(tail -n 80 build.log | curl -s --data-binary @- https://paste.rs)
+            curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+                 -X POST \
+                 -d "{\"state\":\"error\",\"description\":\"$PASTE_URL\",\"context\":\"build-log\"}" \
+                 "https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.sha }}"
+            echo "Build failed with exit code $BUILD_EXIT: $PASTE_URL"
+            exit $BUILD_EXIT
+          fi
 
       - name: Upload APK Artifact
         if: success()
@@ -59,13 +82,3 @@ jobs:
           name: TrackMyGym-debug-apk
           path: build/app/outputs/flutter-apk/app-debug.apk
           retention-days: 14
-
-      - name: Push Build Log on Failure
-        if: failure()
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git checkout -B ci-log
-          git add -f build.log
-          git commit -m "ci: capture build.log failure"
-          git push -f origin ci-log
