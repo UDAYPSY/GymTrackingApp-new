@@ -29,7 +29,7 @@ jobs:
           cache: true
 
       - name: Scaffold Native Platform Runners
-        run: flutter create . --platforms=android,web --org com.trackmygym
+        run: flutter create . --project-name track_my_gym --platforms=android,web --org com.trackmygym
 
       - name: Install Dependencies
         run: flutter pub get
