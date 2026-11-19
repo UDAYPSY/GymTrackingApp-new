@@ -10,6 +10,8 @@ jobs:
   build:
     name: Build & Test TrackMyGym
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout Repository
@@ -38,29 +40,17 @@ jobs:
         run: flutter pub get
 
       - name: Analyze Project Code
-        run: |
-          flutter analyze --no-fatal-warnings --no-fatal-infos 2>&1 | tee analyze.log || {
-            echo "## Flutter Analyze Findings" >> $GITHUB_STEP_SUMMARY
-            echo '```' >> $GITHUB_STEP_SUMMARY
-            cat analyze.log >> $GITHUB_STEP_SUMMARY
-            echo '```' >> $GITHUB_STEP_SUMMARY
-          }
-        continue-on-error: true
+        run: flutter analyze --no-fatal-warnings --no-fatal-infos
 
       - name: Run Unit & Widget Tests
         run: flutter test --no-pub
-        continue-on-error: true
 
       - name: Build Android APK
+        env:
+          GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx2048m -Dorg.gradle.daemon=false"
         run: |
           set -o pipefail
-          flutter build apk --debug 2>&1 | tee build.log || {
-            echo "## Android Build Failure Diagnostics" >> $GITHUB_STEP_SUMMARY
-            echo '```' >> $GITHUB_STEP_SUMMARY
-            tail -n 100 build.log >> $GITHUB_STEP_SUMMARY
-            echo '```' >> $GITHUB_STEP_SUMMARY
-            exit 1
-          }
+          flutter build apk --debug 2>&1 | tee build.log
 
       - name: Upload APK Artifact
         if: success()
@@ -70,9 +60,12 @@ jobs:
           path: build/app/outputs/flutter-apk/app-debug.apk
           retention-days: 14
 
-      - name: Upload Build Log If Failed
+      - name: Push Build Log on Failure
         if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-failure-log
-          path: build.log
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -B ci-log
+          git add -f build.log
+          git commit -m "ci: capture build.log failure"
+          git push -f origin ci-log
