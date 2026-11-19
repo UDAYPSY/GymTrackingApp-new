@@ -80,7 +80,7 @@ class _MembersTabState extends State<MembersTab> {
   void _showCurrencyPicker() {
     final currencies = [
       '₹ (INR) - Indian Rupee',
-      '$ (USD) - US Dollar',
+      r'$ (USD) - US Dollar',
       '€ (EUR) - Euro',
       '£ (GBP) - British Pound',
       'AED - UAE Dirham',

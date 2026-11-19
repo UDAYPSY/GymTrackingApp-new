@@ -30,12 +30,12 @@ void main() {
     });
 
     test('MemberModel calculates full payment status correctly', () {
-      const paidMember = MemberModel(
+      final paidMember = MemberModel(
         id: 'm1',
         membershipId: '1',
         name: 'John Doe',
         batch: 'Morning',
-        plan: PlanModel(id: 'p1', name: 'Plan', price: 1000),
+        plan: const PlanModel(id: 'p1', name: 'Plan', price: 1000),
         planAmount: 1000,
         joiningDate: DateTime(2026, 1, 1),
         paymentDate: DateTime(2026, 1, 1),
@@ -45,12 +45,12 @@ void main() {
       );
       expect(paidMember.isPaidFull, true);
 
-      const dueMember = MemberModel(
+      final dueMember = MemberModel(
         id: 'm2',
         membershipId: '2',
         name: 'Jane Doe',
         batch: 'Evening',
-        plan: PlanModel(id: 'p1', name: 'Plan', price: 1000),
+        plan: const PlanModel(id: 'p1', name: 'Plan', price: 1000),
         planAmount: 1000,
         joiningDate: DateTime(2026, 1, 1),
         paymentDate: DateTime(2026, 1, 1),
