@@ -4,6 +4,7 @@ import '../theme/app_colors.dart';
 import '../models/plan_model.dart';
 import '../models/member_model.dart';
 import '../state/app_state.dart';
+import '../widgets/stepper_header.dart';
 import 'dashboard_screen.dart';
 
 class AddMemberScreen extends StatefulWidget {
@@ -17,6 +18,8 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
   final _formKey = GlobalKey<FormState>();
 
   // Controllers
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
   late final TextEditingController _membershipIdController;
   final TextEditingController _batchController =
       TextEditingController(text: 'No Batch Found');
@@ -30,6 +33,8 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
   final TextEditingController _notesController = TextEditingController();
 
   // State
+  bool _fillTestData = false;
+  String _gender = 'Male'; // 'Male' or 'Female'
   late PlanModel _selectedPlan;
   DateTime _joiningDate = DateTime.now();
   DateTime _paymentDate = DateTime.now();
@@ -67,6 +72,8 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
 
   @override
   void dispose() {
+    _nameController.dispose();
+    _phoneController.dispose();
     _membershipIdController.dispose();
     _batchController.dispose();
     _paidAmountController.dispose();
@@ -77,6 +84,30 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
     _addressController.dispose();
     _notesController.dispose();
     super.dispose();
+  }
+
+  void _onToggleTestData(bool value) {
+    setState(() {
+      _fillTestData = value;
+      if (value) {
+        _nameController.text = 'Rahul Sharma';
+        _phoneController.text = '9876543210';
+        _gender = 'Male';
+        _emailController.text = 'rahul.sharma@example.com';
+        _addressController.text = 'Flat 204, Green Heights, Delhi';
+        _notesController.text = 'Regular fitness and strength training';
+        _paidAmountController.text = '20000';
+        _paymentMethod = 'UPI / QR Code';
+      } else {
+        _nameController.clear();
+        _phoneController.clear();
+        _emailController.clear();
+        _addressController.clear();
+        _notesController.clear();
+        _paidAmountController.text = '0';
+        _paymentMethod = 'Select Payment Method';
+      }
+    });
   }
 
   double get _calculatedDueAmount {
@@ -126,39 +157,43 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
   }
 
   void _onSaveMember() {
-    final paid = double.tryParse(_paidAmountController.text) ?? 0.0;
-    final discountVal = double.tryParse(_discountController.text) ?? 0.0;
-    final admission = double.tryParse(_admissionFeesController.text) ?? 0.0;
+    if (_formKey.currentState?.validate() ?? false) {
+      final paid = double.tryParse(_paidAmountController.text) ?? 0.0;
+      final discountVal = double.tryParse(_discountController.text) ?? 0.0;
+      final admission = double.tryParse(_admissionFeesController.text) ?? 0.0;
 
-    final newMember = MemberModel(
-      id: 'member_${DateTime.now().millisecondsSinceEpoch}',
-      membershipId: _membershipIdController.text.trim(),
-      batch: _batchController.text.trim(),
-      plan: _selectedPlan,
-      planAmount: _selectedPlan.price,
-      joiningDate: _joiningDate,
-      paymentDate: _paymentDate,
-      paidAmount: paid,
-      dueAmount: _calculatedDueAmount,
-      paymentMethod: _paymentMethod,
-      paymentReminder: _paymentReminder,
-      reminderDateTime: _reminderDateTime,
-      comments: _commentsController.text.trim(),
-      discountType: _discountType,
-      discountValue: discountVal,
-      admissionFees: admission,
-      email: _emailController.text.trim(),
-      dateOfBirth: _dob,
-      address: _addressController.text.trim(),
-      notes: _notesController.text.trim(),
-    );
+      final newMember = MemberModel(
+        id: 'member_${DateTime.now().millisecondsSinceEpoch}',
+        membershipId: _membershipIdController.text.trim(),
+        name: _nameController.text.trim(),
+        phone: _phoneController.text.trim(),
+        batch: _batchController.text.trim(),
+        plan: _selectedPlan,
+        planAmount: _selectedPlan.price,
+        joiningDate: _joiningDate,
+        paymentDate: _paymentDate,
+        paidAmount: paid,
+        dueAmount: _calculatedDueAmount,
+        paymentMethod: _paymentMethod,
+        paymentReminder: _paymentReminder,
+        reminderDateTime: _reminderDateTime,
+        comments: _commentsController.text.trim(),
+        discountType: _discountType,
+        discountValue: discountVal,
+        admissionFees: admission,
+        email: _emailController.text.trim(),
+        dateOfBirth: _dob,
+        address: _addressController.text.trim(),
+        notes: _notesController.text.trim(),
+      );
 
-    AppState.instance.addMember(newMember);
+      AppState.instance.addMember(newMember);
 
-    Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (ctx) => const DashboardScreen()),
-      (route) => false,
-    );
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (ctx) => const DashboardScreen()),
+        (route) => false,
+      );
+    }
   }
 
   @override
@@ -191,7 +226,78 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      // Top Card: Membership ID & Batch
+                      // 1. Stepper Progress Header (Step 2 Active)
+                      const StepperHeader(currentStep: 2),
+
+                      const SizedBox(height: 16),
+
+                      // 2. Light Green Banner "Add Members"
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFEBF7F0),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Add Members',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF1E663B),
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            const Text(
+                              'Add members now so you can see real dashboard numbers.',
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Color(0xFF1E663B),
+                                height: 1.3,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            Row(
+                              children: [
+                                Switch(
+                                  value: _fillTestData,
+                                  activeColor: const Color(0xFF1E663B),
+                                  onChanged: _onToggleTestData,
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: const [
+                                      Text(
+                                        'Fill Test Data',
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.bold,
+                                          color: Color(0xFF1E663B),
+                                        ),
+                                      ),
+                                      Text(
+                                        'Add sample members automatically to explore the dashboard.',
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          color: Color(0xFF2D8A52),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      // 3. Member Photo & Basic Details Card
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
@@ -206,32 +312,185 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
                           ],
                         ),
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // Membership ID
+                            // Member Photo Silhouette with Camera Icon
+                            Center(
+                              child: Stack(
+                                children: [
+                                  Container(
+                                    width: 110,
+                                    height: 110,
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFE2E8F0),
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: const Icon(
+                                      Icons.person,
+                                      size: 85,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  Positioned(
+                                    bottom: 0,
+                                    right: 0,
+                                    child: Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: const BoxDecoration(
+                                        color: AppColors.primaryTeal,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: const Icon(
+                                        Icons.camera_alt,
+                                        size: 16,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            const SizedBox(height: 20),
+
+                            // Name *
                             TextFormField(
-                              controller: _membershipIdController,
-                              keyboardType: TextInputType.number,
+                              controller: _nameController,
                               decoration: const InputDecoration(
-                                labelText: 'Membership ID',
+                                labelText: 'Name *',
                                 prefixIcon: Icon(
-                                  Icons.badge_outlined,
+                                  Icons.person_outline,
+                                  color: AppColors.primaryTeal,
+                                ),
+                              ),
+                              validator: (v) => v == null || v.trim().isEmpty
+                                  ? 'Please enter member name'
+                                  : null,
+                            ),
+
+                            const SizedBox(height: 14),
+
+                            // Gender Selector Row
+                            Row(
+                              children: [
+                                const Icon(
+                                  Icons.wc_outlined,
+                                  color: AppColors.primaryTeal,
+                                  size: 22,
+                                ),
+                                const SizedBox(width: 8),
+                                Radio<String>(
+                                  value: 'Male',
+                                  groupValue: _gender,
+                                  activeColor: AppColors.primaryTeal,
+                                  onChanged: (val) {
+                                    setState(() => _gender = val!);
+                                  },
+                                ),
+                                const Text('Male', style: TextStyle(fontSize: 14)),
+                                const SizedBox(width: 16),
+                                Radio<String>(
+                                  value: 'Female',
+                                  groupValue: _gender,
+                                  activeColor: AppColors.primaryTeal,
+                                  onChanged: (val) {
+                                    setState(() => _gender = val!);
+                                  },
+                                ),
+                                const Text('Female', style: TextStyle(fontSize: 14)),
+                              ],
+                            ),
+
+                            const SizedBox(height: 14),
+
+                            // Mobile Number (+91 dropdown + number)
+                            Row(
+                              children: [
+                                Container(
+                                  height: 52,
+                                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(color: AppColors.border),
+                                  ),
+                                  child: Row(
+                                    children: const [
+                                      Text('🇮🇳', style: TextStyle(fontSize: 18)),
+                                      SizedBox(width: 4),
+                                      Text(
+                                        '+91',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 14,
+                                          color: AppColors.textPrimary,
+                                        ),
+                                      ),
+                                      Icon(
+                                        Icons.keyboard_arrow_down,
+                                        color: AppColors.textSecondary,
+                                        size: 18,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: TextFormField(
+                                    controller: _phoneController,
+                                    keyboardType: TextInputType.phone,
+                                    decoration: const InputDecoration(
+                                      hintText: 'Enter mobile number',
+                                    ),
+                                    validator: (v) => v == null || v.trim().isEmpty
+                                        ? 'Please enter mobile number'
+                                        : null,
+                                  ),
+                                ),
+                              ],
+                            ),
+
+                            const SizedBox(height: 14),
+
+                            // Membership ID with Green Border & Indicator
+                            Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(
                                   color: AppColors.successGreen,
+                                  width: 1.5,
+                                ),
+                              ),
+                              child: TextFormField(
+                                controller: _membershipIdController,
+                                keyboardType: TextInputType.number,
+                                decoration: const InputDecoration(
+                                  labelText: 'Membership ID',
+                                  prefixIcon: Icon(
+                                    Icons.badge_outlined,
+                                    color: AppColors.successGreen,
+                                  ),
+                                  border: InputBorder.none,
+                                  enabledBorder: InputBorder.none,
+                                  focusedBorder: InputBorder.none,
                                 ),
                               ),
                             ),
                             const SizedBox(height: 4),
-                            const Padding(
-                              padding: EdgeInsets.only(left: 4),
-                              child: Text(
-                                'Membership ID is available',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: AppColors.successGreen,
-                                  fontWeight: FontWeight.w500,
+                            const Align(
+                              alignment: Alignment.centerLeft,
+                              child: Padding(
+                                padding: EdgeInsets.only(left: 4),
+                                child: Text(
+                                  'Membership ID is available',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: AppColors.successGreen,
+                                    fontWeight: FontWeight.w500,
+                                  ),
                                 ),
                               ),
                             ),
+
                             const SizedBox(height: 14),
 
                             // Batch / Group Class
@@ -251,7 +510,7 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
 
                       const SizedBox(height: 16),
 
-                      // Plan Details Card
+                      // 4. Plan Details Card (Image 2)
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
@@ -478,7 +737,7 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
 
                             const SizedBox(height: 14),
 
-                            // Comments
+                            // Comments (Image 3)
                             TextFormField(
                               controller: _commentsController,
                               decoration: const InputDecoration(
@@ -569,7 +828,7 @@ class _AddMemberScreenState extends State<AddMemberScreen> {
 
                       const SizedBox(height: 16),
 
-                      // Member Details Card
+                      // 5. Member Details Card (Image 3)
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
